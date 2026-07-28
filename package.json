@@ -1,0 +1,25 @@
+{
+  "name": "technews",
+  "version": "1.0.0",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "collect": "node collector.js",
+    "cleanup": "node cleanup.js",
+    "books": "node books-job.js",
+    "papers": "node research-job.js papers",
+    "github": "node research-job.js github",
+    "research": "node research-job.js all"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "cloudscraper": "^4.6.0",
+    "express": "^4.21.2",
+    "iconv-lite": "^0.6.3",
+    "rss-parser": "^3.13.0",
+    "sanitize-html": "^2.13.1",
+    "string-similarity": "^4.0.4",
+    "translate-google": "^1.5.0"
+  }
+}

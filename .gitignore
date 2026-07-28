@@ -1,0 +1,34 @@
+# deps
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# env & secrets
+.env
+.env.*
+!.env.example
+
+# runtime data
+data/*
+!data/.gitkeep
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# local probes / one-off scripts that may contain secrets
+_deploy*
+_probe*
+_run*
+_check*
+_patch*
+_hot-smoke.js
+_jd_parse.js
+_gh_release.py
+*.pem
+*.key
+id_rsa*
+id_ed25519*
