@@ -127,16 +127,20 @@ function isAiHotRelated(title, extra = '') {
 }
 
 /**
- * 热点入选：AI 相关 + 非广告八卦；公众号通道还须偏技术/产品
+ * 热点入选：AI 相关 + 非广告八卦；时间须为昨天或今天（上海自然日）
+ * 公众号通道还须偏技术/产品
  */
 function keepHotspotItem(it) {
   const title = it.title || '';
   const summary = it.summary || '';
   if (isContentNoise(title, summary)) return false;
 
-  // 公众号 / 镜像 RSS：只保留当天与昨天
+  // 公众号 / 镜像：必须有发布时间，且为昨天或今天
   if (it.channel === 'wechat-mirror' || it.channel === 'video-proxy') {
     if (!it.publishedAt || !isTodayOrYesterday(it.publishedAt)) return false;
+  } else if (it.publishedAt && !isTodayOrYesterday(it.publishedAt)) {
+    // 其它通道：有时间戳则同样限制在昨天+今天
+    return false;
   }
 
   const fromAiWechat =

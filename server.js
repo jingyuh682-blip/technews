@@ -12,6 +12,7 @@ const {
   findLatestBooks,
   findLatestSection,
   upsertHotspotsToday,
+  mergeTwoDayField,
   RETENTION_DAYS
 } = require('./store');
 const { enrichOneZh, needsPaperZh, needsGithubZh } = require('./translate-research');
@@ -32,9 +33,24 @@ const {
   setPullProgress
 } = require('./wechat-direct');
 const { collectHotspots } = require('./hot-sources');
-const { generateTopicPlan } = require('./books');
+const { generateTopicPlan, buildBooksInsight } = require('./books');
+const { runCollector } = require('./collector');
+const { buildPapers } = require('./papers');
+const { buildGithub } = require('./github-hot');
 
 let wechatRefreshRunning = false;
+let fullRefreshRunning = false;
+let fullRefreshProgress = {
+  phase: 'idle',
+  pct: 0,
+  message: '',
+  error: '',
+  results: null
+};
+
+function setFullRefreshProgress(patch) {
+  fullRefreshProgress = { ...fullRefreshProgress, ...patch };
+}
 
 const app = express();
 const PORT = Number(process.env.PORT || 3001);
@@ -138,9 +154,11 @@ app.get('/api/news', (req, res) => {
   purgeExpired();
   const date = String(req.query.date || todayKey());
   const day = readDay(date);
-  const items = day.items.map(mapListItem);
+  // 选中日展示 = 昨天 + 今天（合并相邻两日文件，避免跨日漏采）
+  const items = mergeTwoDayField(date, 'items').map(mapListItem);
   res.json({
     date,
+    window: 'yesterday+today',
     updatedAt: day.updatedAt,
     count: items.length,
     items
@@ -151,9 +169,10 @@ app.get('/api/hotspots', (req, res) => {
   purgeExpired();
   const date = String(req.query.date || todayKey());
   const day = readDay(date);
-  const items = day.hotspots.map(mapListItem);
+  const items = mergeTwoDayField(date, 'hotspots').map(mapListItem);
   res.json({
     date,
+    window: 'yesterday+today',
     updatedAt: day.updatedAt,
     count: items.length,
     items
@@ -487,6 +506,115 @@ app.post('/api/wechat-refresh', async (req, res) => {
       error: 'refresh'
     });
     res.status(500).json({ error: err.message || String(err), auth: getAuthStatus() });
+  }
+});
+
+app.get('/api/refresh/status', (_req, res) => {
+  res.json({
+    running: fullRefreshRunning,
+    ...fullRefreshProgress
+  });
+});
+
+app.post('/api/refresh', async (_req, res) => {
+  try {
+    if (fullRefreshRunning) {
+      return res.json({
+        ok: true,
+        started: false,
+        running: true,
+        ...fullRefreshProgress
+      });
+    }
+
+    fullRefreshRunning = true;
+    setFullRefreshProgress({
+      phase: 'start',
+      pct: 2,
+      message: '强制刷新已开始：新闻 / 热点 / 词云 / 论文 / GitHub / 图书…',
+      error: '',
+      results: null
+    });
+
+    setImmediate(async () => {
+      const results = {};
+      try {
+        setFullRefreshProgress({
+          phase: 'news',
+          pct: 10,
+          message: '正在重新拉取科技新闻、热点与词云…'
+        });
+        results.collector = await runCollector();
+
+        setFullRefreshProgress({
+          phase: 'papers',
+          pct: 55,
+          message: '正在强制刷新论文热点…'
+        });
+        const papers = await buildPapers(todayKey(), { force: true });
+        results.papers = (papers && papers.items) ? papers.items.length : 0;
+
+        setFullRefreshProgress({
+          phase: 'github',
+          pct: 70,
+          message: '正在强制刷新 GitHub 热点…'
+        });
+        const github = await buildGithub(todayKey(), { force: true });
+        results.github = (github && github.items) ? github.items.length : 0;
+
+        setFullRefreshProgress({
+          phase: 'books',
+          pct: 85,
+          message: '正在强制刷新图书洞察…'
+        });
+        const books = await buildBooksInsight(todayKey(), { forceCrawl: true });
+        results.books = {
+          bestsellers: ((books && books.bestsellers) || []).length,
+          planning: ((books && books.planning) || []).length
+        };
+
+        setFullRefreshProgress({
+          phase: 'done',
+          pct: 100,
+          message: '全部数据已强制刷新完成',
+          error: '',
+          results
+        });
+        setTimeout(() => {
+          if (fullRefreshProgress.phase === 'done' || fullRefreshProgress.phase === 'error') {
+            setFullRefreshProgress({ phase: 'idle', pct: 0, message: '', error: '' });
+          }
+        }, 12000);
+      } catch (err) {
+        console.error('[api] full refresh fail:', err.message || err);
+        setFullRefreshProgress({
+          phase: 'error',
+          pct: 0,
+          message: err.message || String(err),
+          error: 'refresh',
+          results
+        });
+      } finally {
+        fullRefreshRunning = false;
+      }
+    });
+
+    res.json({
+      ok: true,
+      started: true,
+      running: true,
+      ...fullRefreshProgress
+    });
+  } catch (err) {
+    console.error('[api] refresh fail:', err.message || err);
+    fullRefreshRunning = false;
+    setFullRefreshProgress({
+      phase: 'error',
+      pct: 0,
+      message: err.message || String(err),
+      error: 'refresh'
+    });
+    res.status(500).json({ error: err.message || String(err) });
   }
 });
 

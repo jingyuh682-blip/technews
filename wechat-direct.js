@@ -4,7 +4,7 @@
  */
 const fs = require('fs');
 const path = require('path');
-const { makeId } = require('./store');
+const { makeId, isTodayOrYesterday } = require('./store');
 const { isContentNoise, hasTechOrProductSignal } = require('./content-filter');
 const { autoResolveAccounts, resolveOneAccount, SEED_MP_IDS } = require('./wechat-auto-resolve');
 
@@ -101,23 +101,6 @@ function isWithinLastDays(isoOrDate, days = 2) {
   if (Number.isNaN(t)) return false;
   const age = Date.now() - t;
   return age >= -60 * 60 * 1000 && age <= days * 24 * 60 * 60 * 1000;
-}
-
-/** 当天或前一天（Asia/Shanghai 自然日） */
-function isTodayOrYesterday(isoOrDate) {
-  const t = Date.parse(isoOrDate);
-  if (Number.isNaN(t)) return false;
-  if (t - Date.now() > 60 * 60 * 1000) return false;
-  const fmt = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Shanghai',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  });
-  const day = fmt.format(new Date(t));
-  const today = fmt.format(new Date());
-  const yesterday = fmt.format(new Date(Date.now() - 24 * 60 * 60 * 1000));
-  return day === today || day === yesterday;
 }
 
 function emptyAuth(status = 'missing') {

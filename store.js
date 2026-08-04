@@ -16,6 +16,83 @@ function todayKey(d = new Date()) {
   return `${y}-${m}-${day}`;
 }
 
+/** Asia/Shanghai 自然日 YYYY-MM-DD（与是否夏令时无关，中国无 DST） */
+function shanghaiDayKey(d = new Date()) {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(d);
+}
+
+function prevDateKey(dateKey) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(dateKey || ''));
+  if (!m) return null;
+  const dt = new Date(`${m[1]}-${m[2]}-${m[3]}T12:00:00+08:00`);
+  dt.setTime(dt.getTime() - 24 * 60 * 60 * 1000);
+  return shanghaiDayKey(dt);
+}
+
+function shanghaiDayStart(dateKey) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(dateKey || ''));
+  if (!m) return null;
+  return new Date(`${m[1]}-${m[2]}-${m[3]}T00:00:00+08:00`);
+}
+
+/**
+ * 采集 / 展示窗口：选中日及其前一天（上海自然日）。
+ * 无时间戳则保留（由调用方决定是否先要求有时间）。
+ */
+function isPublishedOnDateOrPrev(isoOrDate, dateKey) {
+  if (!isoOrDate) return true;
+  const t = Date.parse(isoOrDate);
+  if (Number.isNaN(t)) return true;
+  if (t - Date.now() > 60 * 60 * 1000) return false;
+  const day = shanghaiDayKey(new Date(t));
+  const prev = prevDateKey(dateKey);
+  return day === dateKey || (prev != null && day === prev);
+}
+
+/** 当天或昨天（Asia/Shanghai），供新闻/热点采集过滤 */
+function isTodayOrYesterday(isoOrDate, now = new Date()) {
+  if (!isoOrDate) return false;
+  const t = Date.parse(isoOrDate);
+  if (Number.isNaN(t)) return false;
+  if (t - Date.now() > 60 * 60 * 1000) return false;
+  return isPublishedOnDateOrPrev(isoOrDate, shanghaiDayKey(now));
+}
+
+/** 新闻采集窗口：昨天 00:00（上海）→ 当前时刻 */
+function collectNewsWindow(now = new Date()) {
+  const today = shanghaiDayKey(now);
+  const yesterday = prevDateKey(today);
+  const start = shanghaiDayStart(yesterday) || new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  return { start, end: now, today, yesterday };
+}
+
+/**
+ * 合并「选中日 + 前一日」文件中的新闻或热点，并按两日窗口过滤，避免跨日漏条目。
+ */
+function mergeTwoDayField(dateKey, field) {
+  const key = String(dateKey || todayKey());
+  const prev = prevDateKey(key);
+  const cur = readDay(key);
+  const older = prev ? readDay(prev) : emptyDay(prev || key);
+  const map = new Map();
+  for (const it of [...(older[field] || []), ...(cur[field] || [])]) {
+    if (!it || !it.id) continue;
+    const when = it.publishedAt || it.collectedAt;
+    if (when && !isPublishedOnDateOrPrev(when, key)) continue;
+    map.set(it.id, it);
+  }
+  return Array.from(map.values()).sort((a, b) => {
+    const ta = Date.parse(a.publishedAt || a.collectedAt || 0) || 0;
+    const tb = Date.parse(b.publishedAt || b.collectedAt || 0) || 0;
+    return tb - ta;
+  });
+}
+
 function parseDateKey(key) {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(key || '');
   if (!m) return null;
@@ -356,6 +433,13 @@ module.exports = {
   DATA_DIR,
   RETENTION_DAYS,
   todayKey,
+  shanghaiDayKey,
+  prevDateKey,
+  shanghaiDayStart,
+  isPublishedOnDateOrPrev,
+  isTodayOrYesterday,
+  collectNewsWindow,
+  mergeTwoDayField,
   makeId,
   readDay,
   writeDay,

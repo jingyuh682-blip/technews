@@ -2,7 +2,7 @@
 /**
  * 科技新闻 + 科技热点 + 词云：每天早晨 08:30 执行一次
  * crontab: 30 8 * * *
- * 新闻时间窗：昨日 00:00（本地）→ 任务执行时刻（今早）
+ * 新闻时间窗：昨天 00:00 → 当前时刻（Asia/Shanghai，含昨天与今天）
  */
 const Parser = require("rss-parser");
 const sanitizeHtml = require("sanitize-html");
@@ -16,24 +16,25 @@ const {
   ensureDataDir,
   todayKey,
   purgeHotSourcesFromNews,
-  writeDayPayload
+  writeDayPayload,
+  collectNewsWindow,
+  isTodayOrYesterday
 } = require("./store");
 const { collectHotspots } = require("./hot-sources");
 const { buildWordcloud } = require("./wordcloud");
 const { HOT_ONLY_SOURCE_IDS } = require("./sources");
 const { keepNewsItem } = require("./content-filter");
 
-/** 昨日 0 点至当前时刻的采集窗口（Asia/Shanghai 服务器本地时区） */
+/** @deprecated 使用 collectNewsWindow；保留导出兼容 */
 function newsWindow(now) {
-  var end = now || new Date();
-  var start = new Date(end.getFullYear(), end.getMonth(), end.getDate() - 1, 0, 0, 0, 0);
-  return { start: start, end: end };
+  return collectNewsWindow(now || new Date());
 }
 
-function inNewsWindow(item, start, end) {
-  var t = Date.parse(item && (item.publishedAt || item.collectedAt) || 0);
-  if (!t || Number.isNaN(t)) return true;
-  return t >= start.getTime() && t <= end.getTime();
+function inNewsWindow(item) {
+  var publishedAt = item && item.publishedAt;
+  // 无发布时间：保留（采集时刻写入当天文件，展示侧会再按两日窗口合并）
+  if (!publishedAt) return true;
+  return isTodayOrYesterday(publishedAt);
 }
 
 const parser = new Parser({
@@ -292,7 +293,7 @@ function deduplicateItems(items, threshold) {
 }
 
 // ---- Main ----
-async function main() {
+async function runCollector() {
   ensureDataDir();
   console.log("[collector] start " + new Date().toISOString());
   console.log("[collector] sources=" + sources.length + " keywords=" + KEYWORDS.length);
@@ -345,14 +346,15 @@ async function main() {
   // Enrich images
   unique = await enrichImages(unique);
 
-  // 仅保留「昨日 0 点 → 今早」窗口内的新闻
-  var win = newsWindow(new Date());
+  // 仅保留「昨天 + 今天」（Asia/Shanghai 自然日）
+  var win = collectNewsWindow(new Date());
   var beforeWindow = unique.length;
   unique = unique.filter(function(it) {
-    return inNewsWindow(it, win.start, win.end);
+    return inNewsWindow(it);
   });
   console.log(
-    "[collector] news window " + win.start.toISOString() + " → " + win.end.toISOString() +
+    "[collector] news window " + win.yesterday + " + " + win.today +
+    " (" + win.start.toISOString() + " → " + win.end.toISOString() + ")" +
     "; kept " + unique.length + "/" + beforeWindow
   );
 
@@ -383,9 +385,11 @@ async function main() {
 
   // Hotspots（清晨快照，全量替换当日）
   console.log("[collector] collecting hotspots...");
+  var hotTotal = 0;
   try {
     var hot = await collectHotspots();
     var hotSaved = upsertHotspotsToday(hot.items);
+    hotTotal = hotSaved.total || 0;
     console.log(
       "[collector] hotspots saved added=" + hotSaved.added +
       " updated=" + hotSaved.updated + " total=" + hotSaved.total
@@ -402,9 +406,19 @@ async function main() {
   } catch (wcErr) {
     console.error("[collector] wordcloud failed:", wcErr && wcErr.message ? wcErr.message : wcErr);
   }
+
+  return {
+    date: todayKey(),
+    news: unique.length,
+    hotspots: hotTotal
+  };
 }
 
-main().catch(function(err) {
-  console.error("[collector] fatal", err);
-  process.exit(1);
-});
+if (require.main === module) {
+  runCollector().catch(function(err) {
+    console.error("[collector] fatal", err);
+    process.exit(1);
+  });
+}
+
+module.exports = { runCollector, newsWindow };

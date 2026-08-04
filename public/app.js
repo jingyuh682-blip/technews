@@ -80,10 +80,41 @@
   }
 
   async function api(path) {
-    const res = await fetch(BASE + path, { headers: { Accept: 'application/json' } });
+    const res = await fetch(BASE + path, {
+      headers: { Accept: 'application/json' },
+      cache: 'no-store'
+    });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || ('请求失败 ' + res.status));
     return data;
+  }
+
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async function forceRefreshAll() {
+    const tab = getQuery('tab') || 'news';
+    renderLoading('正在强制重新拉取全部数据…', tab);
+    try {
+      await apiPost('/api/refresh', {});
+      let guard = 0;
+      while (guard++ < 240) {
+        await sleep(2000);
+        const st = await api('/api/refresh/status');
+        const msg = st.message || '正在强制重新拉取…';
+        const pct = st.pct != null ? ` ${st.pct}%` : '';
+        renderLoading(msg + pct, tab);
+        if (st.phase === 'done') break;
+        if (st.phase === 'error') throw new Error(st.message || '刷新失败');
+        if (st.phase === 'idle' && !st.running) break;
+      }
+      setQuery({ date: '', tab }, true);
+    } catch (err) {
+      renderLoading('刷新失败：' + (err.message || String(err)), tab);
+      await sleep(2200);
+    }
+    await route();
   }
 
   function shell(inner) {
@@ -156,7 +187,7 @@
       setQuery({ date: e.target.value, tab });
       route();
     });
-    qs('#reloadBtn').addEventListener('click', () => route());
+    qs('#reloadBtn').addEventListener('click', () => forceRefreshAll());
     document.querySelectorAll('.tab').forEach((btn) => {
       btn.addEventListener('click', () => {
         setQuery({ date, tab: btn.getAttribute('data-tab') });
@@ -613,7 +644,8 @@
     const res = await fetch(BASE + path, {
       method: 'POST',
       headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify(body || {})
+      body: JSON.stringify(body || {}),
+      cache: 'no-store'
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || ('请求失败 ' + res.status));
