@@ -5,6 +5,7 @@ import test from 'node:test';
 
 const root = path.resolve(import.meta.dirname, '..');
 const themePath = path.join(root, 'public', 'theme-calm-graphite.css');
+const indexPath = path.join(root, 'public', 'index.html');
 
 test('uses a paper-slate newsroom palette for long-form reading', () => {
   const css = fs.readFileSync(themePath, 'utf8');
@@ -41,4 +42,23 @@ test('keeps alternate themes in the same readable editorial family', () => {
     const pattern = ':root\\[data-theme="' + theme + '"\\][\\s\\S]*?--accent: ' + accent;
     assert.match(css, new RegExp(pattern));
   }
+});
+
+test('applies a complete editorial color system beyond the page background', () => {
+  const css = fs.readFileSync(themePath, 'utf8');
+  const html = fs.readFileSync(indexPath, 'utf8');
+  assert.match(css, /Complete editorial color system/);
+  for (const token of [
+    '--on-accent: #FFFFFF',
+    '--section: #EEF3F2',
+    '--cloud-surface: #E9F0EE',
+    '--overlay: rgba(38, 52, 59, 0.34)'
+  ]) {
+    assert.ok(css.includes(token), 'missing semantic color token: ' + token);
+  }
+  assert.match(css, /\.pane-h[\s\S]*background:\s*var\(--section\)/);
+  assert.match(css, /\.cloud-stage[\s\S]*background:\s*var\(--cloud-surface\)/);
+  assert.match(css, /\.wx-overlay[\s\S]*background:\s*var\(--overlay\)/);
+  assert.match(css, /\.book-plan-btn,[\s\S]*color:\s*var\(--on-accent\)/);
+  assert.match(html, /<meta name="theme-color" content="#F3F5F4"/);
 });

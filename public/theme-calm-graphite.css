@@ -359,3 +359,205 @@ select {
   font-weight: 600;
   letter-spacing: 0.05em;
 }
+
+/* Complete editorial color system. */
+:root {
+  --on-accent: #FFFFFF;
+  --on-danger: #FFFFFF;
+  --section: #EEF3F2;
+  --cloud-surface: #E9F0EE;
+  --overlay: rgba(38, 52, 59, 0.34);
+  --focus: rgba(77, 120, 136, 0.44);
+}
+
+:root[data-theme="cool"] {
+  --section: #EAF0F2;
+  --cloud-surface: #E9EFF1;
+  --overlay: rgba(40, 58, 66, 0.34);
+  --focus: rgba(82, 122, 137, 0.44);
+}
+
+:root[data-theme="ink"] {
+  color-scheme: dark;
+  --on-accent: #1D2F34;
+  --section: #30404A;
+  --cloud-surface: #263740;
+  --overlay: rgba(8, 15, 18, 0.66);
+  --focus: rgba(145, 182, 182, 0.52);
+}
+
+:root[data-theme="paper"] {
+  --section: #F0ECE4;
+  --cloud-surface: #EEEAE2;
+  --overlay: rgba(56, 54, 50, 0.34);
+  --focus: rgba(154, 106, 82, 0.42);
+}
+
+:root[data-theme="forest"] {
+  --section: #E8EFEA;
+  --cloud-surface: #E5EEE8;
+  --overlay: rgba(47, 66, 56, 0.34);
+  --focus: rgba(95, 126, 109, 0.44);
+}
+
+:root[data-theme="plum"] {
+  --section: #EEE9ED;
+  --cloud-surface: #ECE7EB;
+  --overlay: rgba(69, 61, 69, 0.34);
+  --focus: rgba(130, 108, 121, 0.44);
+}
+
+html {
+  background: var(--void);
+  color-scheme: light;
+}
+
+html, body {
+  background:
+    radial-gradient(780px 360px at 8% -8%, var(--glow), transparent 60%),
+    radial-gradient(640px 280px at 100% 100%, var(--glow-2), transparent 54%),
+    var(--void);
+  color: var(--ink);
+}
+
+body::before { opacity: 0; }
+
+a,
+.source-pill,
+.channel-pill,
+.book-item .rank,
+.book-item .sales,
+.gh-delta,
+.plat-cov.ok strong {
+  color: var(--accent);
+}
+
+.topbar {
+  background: var(--void);
+  border-bottom-color: var(--line-strong);
+}
+
+.dash-wrap { background: var(--gutter); }
+
+.pane {
+  background: var(--panel);
+  border-color: var(--line);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--ink) 7%, transparent),
+    0 8px 28px color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.pane-h {
+  background: var(--section);
+  border-bottom-color: var(--line-strong);
+}
+
+.brand,
+.pane-h h2,
+.section-title,
+.card-body h2,
+.plan-card h3,
+.detail-body h1,
+.word-detail strong { color: var(--ink); }
+
+.brand small,
+.pane-meta,
+label.field,
+.card-body p,
+.card-meta,
+.detail-meta,
+.hint,
+.muted,
+.word-score,
+.wx-bg-progress-text,
+.wx-progress-detail,
+.wx-pull-dock-inner span { color: var(--muted); }
+
+.title-zh,
+.analysis,
+.cat-list,
+.method-list,
+.book-plan-card .book-plan-field,
+.detail-summary,
+.detail-content,
+.orig-summary,
+.plan-card p,
+.word-detail p,
+.word-explain-body { color: var(--ink-soft); }
+
+select,
+.book-plan-input {
+  color: var(--ink);
+  background: var(--panel);
+  border-color: var(--line);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ink) 5%, transparent);
+}
+
+select:focus-visible,
+.book-plan-input:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.book-plan-btn,
+.wx-auth-pull,
+.actions a.primary {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.wx-auth-toggle,
+button.refresh,
+.back-btn,
+.actions button.secondary {
+  color: var(--ink);
+  border-color: var(--line);
+  background: transparent;
+}
+
+button.refresh:hover,
+.wx-auth-toggle:hover,
+.back-btn:hover,
+.actions button.secondary:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+  background: var(--accent-dim);
+}
+
+.pane-b::-webkit-scrollbar-thumb { background: var(--line-strong); }
+
+.card {
+  color: var(--ink);
+  border-bottom-color: var(--line);
+}
+
+.card:hover { background: var(--accent-dim); }
+
+.thumb { background: linear-gradient(135deg, var(--accent-dim), var(--panel-2)); }
+
+.cloud-stage { background: var(--cloud-surface); }
+.cloud-word-hit:hover { outline-color: var(--focus); }
+
+.word-detail {
+  color: var(--ink);
+  background: var(--panel);
+  border-color: var(--line);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--ink) 12%, transparent);
+}
+
+.word-row,
+.wx-overlay-card,
+.wx-pull-dock-inner {
+  color: var(--ink);
+  background: var(--panel);
+  border-color: var(--line);
+}
+
+.wx-overlay { background: var(--overlay); }
+.wx-qr-frame { background: var(--panel); border-color: var(--line); }
+.wx-bg-progress-track { background: var(--section); }
+
+.cloud-word-x { color: var(--on-danger); }
+.error, .book-plan-error, .wx-auth-error { color: var(--danger); }
