@@ -17,5 +17,5 @@ test('uses the approved editorial dashboard grid', () => {
   assert.equal(fs.existsSync(layoutPath), true, 'editorial grid stylesheet must be present');
   const css = fs.readFileSync(layoutPath, 'utf8');
   assert.match(css, /grid-template-columns:\s*0\.86fr\s+1\.08fr\s+1\.08fr\s+1\.08fr;/);
-  assert.match(css, /grid-template-areas:\s*"cloud news hot ghs"\s*"books papers hot ghr";/s);
+  assert.match(css, /grid-template-areas:\s*"cloud hot news ghs"\s*"books hot papers ghr";/s);
 });
