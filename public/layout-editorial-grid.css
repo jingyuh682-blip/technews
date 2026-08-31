@@ -1,0 +1,6 @@
+.dash-wrap {
+  grid-template-columns: 0.86fr 1.08fr 1.08fr 1.08fr;
+  grid-template-areas:
+    "cloud news hot ghs"
+    "books papers hot ghr";
+}
