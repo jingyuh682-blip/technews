@@ -150,7 +150,63 @@
     return map[ch] || '';
   }
 
-  function thumbHtml(item) {
+  const SOURCE_LOGOS = Object.freeze({
+    'baidu-hot': 'https://www.baidu.com/favicon.ico',
+    'weibo-hot': 'https://weibo.com/favicon.ico',
+    'zhihu-hot': 'https://www.zhihu.com/favicon.ico',
+    'jiqizhixin-hot': 'https://www.jiqizhixin.com/favicon.ico',
+    'qbitai-hot': 'https://www.qbitai.com/favicon.ico',
+    'leiphone-hot': 'https://www.leiphone.com/favicon.ico',
+    'ifanr-hot': 'https://www.ifanr.com/favicon.ico',
+    'sspai-hot': 'https://sspai.com/favicon.ico',
+    'jiemian-hot': 'https://www.jiemian.com/favicon.ico',
+    'infoq-cn-hot': 'https://www.infoq.cn/favicon.ico',
+    'kr36-video': 'https://36kr.com/favicon.ico',
+    '36kr-hot': 'https://36kr.com/favicon.ico',
+    'ithome': 'https://www.ithome.com/favicon.ico',
+    openai: 'https://openai.com/favicon.ico',
+    'google-ai': 'https://blog.google/favicon.ico',
+    huggingface: 'https://huggingface.co/favicon.ico',
+    'techcrunch-ai': 'https://techcrunch.com/favicon.ico',
+    'verge-ai': 'https://www.theverge.com/favicon.ico',
+    'mit-tr': 'https://www.technologyreview.com/favicon.ico',
+    'hn-ai': 'https://news.ycombinator.com/favicon.ico',
+    ars: 'https://arstechnica.com/favicon.ico',
+    'github-blog': 'https://github.blog/favicon.ico',
+    solidot: 'https://www.solidot.org/favicon.ico',
+    kr36: 'https://36kr.com/favicon.ico'
+  });
+
+  function sourceLogoUrl(item) {
+    const id = String(item.sourceId || '');
+    if (SOURCE_LOGOS[id]) return SOURCE_LOGOS[id];
+    try {
+      const u = new URL(String(item.url || ''));
+      return u.origin + '/favicon.ico';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function sourceMonogram(source) {
+    const raw = String(source || '来源').trim();
+    const compact = raw.replace(/[^0-9A-Za-z\u4e00-\u9fff]/g, '');
+    return compact.slice(0, 2) || '源';
+  }
+
+  function sourceLogoThumbHtml(item) {
+    const label = escapeHtml(item.source || '信息来源');
+    const monogram = escapeHtml(sourceMonogram(item.source));
+    const logo = sourceLogoUrl(item);
+    return '<div class="thumb source-logo" title="' + label + '" aria-label="' + label + '">' +
+      (logo ? '<img src="' + escapeHtml(logo) + '" alt="' + label + ' logo" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true; this.nextElementSibling.hidden=false;" />' : '') +
+      '<span class="source-monogram"' + (logo ? ' hidden' : '') + '>' + monogram + '</span>' +
+      '</div>';
+  }
+
+
+  function thumbHtml(item, options = {}) {
+    if (options.sourceLogo) return sourceLogoThumbHtml(item);
     if (item.image) {
       const src = escapeHtml(proxyImage(item.image));
       return `<img class="thumb" src="${src}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=\\'thumb placeholder\\'>AI</div>'" />`;
@@ -196,12 +252,12 @@
     });
   }
 
-  function cardsHtml(items, date) {
+  function cardsHtml(items, date, options = {}) {
     return (items || []).map((item, idx) => {
       const ch = channelLabel(item.channel);
       return `
       <a class="card" href="${BASE}/article/${encodeURIComponent(item.id)}?date=${encodeURIComponent(date)}&tab=${encodeURIComponent(getQuery('tab') || 'news')}" style="animation-delay:${Math.min(idx, 12) * 30}ms">
-        ${thumbHtml(item)}
+        ${thumbHtml(item, options)}
         <div class="card-body">
           <h2>${escapeHtml(item.title)}</h2>
           <p>${escapeHtml(item.summary || '')}</p>
@@ -241,7 +297,7 @@
         ${wechatAuthHtml}
         <p class="meta-line">${escapeHtml(date)} · 共 ${news.count || 0} 条${news.updatedAt ? ' · 更新于 ' + formatTime(news.updatedAt) : ''}</p>
         <section class="list">
-          ${cardsHtml(news.items, date) || `<div class="empty">${tab === 'hot' ? '这一天还没有热点，稍后再来或换一天看看。' : '这一天还没有汇总新闻，稍后再来或换一天看看。'}</div>`}
+          ${cardsHtml(news.items, date, tab === 'hot' ? { sourceLogo: true } : {}) || `<div class="empty">${tab === 'hot' ? '这一天还没有热点，稍后再来或换一天看看。' : '这一天还没有汇总新闻，稍后再来或换一天看看。'}</div>`}
         </section>
       `);
       bindCommon(date, tab);
