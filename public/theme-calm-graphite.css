@@ -216,120 +216,120 @@ select {
   --glow-2: rgba(133, 123, 175, 0.11);
 }
 
-/* Newsroom palette revision: restrained newsprint colors for long-form reading. */
+/* Newsroom palette revision: paper-slate reading palette with a single muted accent. */
 :root:not([data-theme]),
 :root[data-theme="mist"] {
-  --void: #F4F6F7;
-  --void-2: #EEF2F4;
+  --void: #F3F5F4;
+  --void-2: #EDF1EF;
   --panel: #FFFFFF;
-  --panel-2: #F8FAFB;
-  --ink: #1E2A33;
-  --ink-soft: #52636D;
-  --muted: #71818A;
-  --line: rgba(30, 42, 51, 0.12);
-  --line-strong: rgba(30, 42, 51, 0.24);
-  --accent: #2F6F8F;
-  --accent-dim: rgba(47, 111, 143, 0.12);
-  --danger: #B85C5C;
-  --gutter: #E7ECEF;
-  --shadow: 0 18px 40px rgba(30, 42, 51, 0.12);
-  --glow: rgba(47, 111, 143, 0.06);
-  --glow-2: rgba(119, 145, 160, 0.10);
+  --panel-2: #F7F9F8;
+  --ink: #26343B;
+  --ink-soft: #5A6970;
+  --muted: #7A888D;
+  --line: rgba(38, 52, 59, 0.13);
+  --line-strong: rgba(38, 52, 59, 0.24);
+  --accent: #4D7888;
+  --accent-dim: rgba(77, 120, 136, 0.11);
+  --danger: #A86159;
+  --gutter: #DEE5E1;
+  --shadow: 0 18px 40px rgba(40, 57, 61, 0.11);
+  --glow: rgba(77, 120, 136, 0.05);
+  --glow-2: rgba(126, 150, 157, 0.08);
 }
 
 :root[data-theme="cool"] {
-  --void: #EAF2F6;
-  --void-2: #E1ECF2;
-  --panel: #FCFEFF;
-  --panel-2: #F2F8FA;
-  --ink: #203744;
-  --ink-soft: #536E7A;
-  --muted: #718996;
-  --line: rgba(32, 55, 68, 0.12);
-  --line-strong: rgba(32, 55, 68, 0.24);
-  --accent: #2B7896;
-  --accent-dim: rgba(43, 120, 150, 0.12);
-  --danger: #B85F5C;
-  --gutter: #DCE8EE;
-  --shadow: 0 18px 40px rgba(35, 74, 91, 0.12);
-  --glow: rgba(43, 120, 150, 0.06);
-  --glow-2: rgba(105, 145, 170, 0.10);
+  --void: #EEF3F5;
+  --void-2: #E6EEF1;
+  --panel: #FFFFFF;
+  --panel-2: #F6F9FA;
+  --ink: #283A42;
+  --ink-soft: #5C7077;
+  --muted: #7A8D93;
+  --line: rgba(40, 58, 66, 0.12);
+  --line-strong: rgba(40, 58, 66, 0.24);
+  --accent: #527A89;
+  --accent-dim: rgba(82, 122, 137, 0.11);
+  --danger: #A8615A;
+  --gutter: #DFE8EA;
+  --shadow: 0 18px 40px rgba(35, 57, 64, 0.11);
+  --glow: rgba(82, 122, 137, 0.05);
+  --glow-2: rgba(115, 143, 151, 0.08);
 }
 
 :root[data-theme="ink"] {
-  --void: #17242C;
-  --void-2: #1F303A;
-  --panel: #263B46;
-  --panel-2: #304853;
-  --ink: #EAF0F2;
-  --ink-soft: #C0CDD2;
-  --muted: #9BAEB6;
-  --line: rgba(234, 240, 242, 0.16);
-  --line-strong: rgba(234, 240, 242, 0.28);
-  --accent: #75B7A7;
-  --accent-dim: rgba(117, 183, 167, 0.15);
-  --danger: #DF958B;
-  --gutter: #111C22;
-  --shadow: 0 18px 40px rgba(7, 14, 18, 0.32);
-  --glow: rgba(117, 183, 167, 0.07);
-  --glow-2: rgba(102, 136, 151, 0.12);
+  --void: #1F282E;
+  --void-2: #26333A;
+  --panel: #2C3A42;
+  --panel-2: #34464F;
+  --ink: #EFF3F2;
+  --ink-soft: #C5D0D1;
+  --muted: #A7B5B7;
+  --line: rgba(239, 243, 242, 0.16);
+  --line-strong: rgba(239, 243, 242, 0.28);
+  --accent: #91B6B6;
+  --accent-dim: rgba(145, 182, 182, 0.14);
+  --danger: #D38A82;
+  --gutter: #182126;
+  --shadow: 0 18px 40px rgba(7, 14, 18, 0.30);
+  --glow: rgba(145, 182, 182, 0.06);
+  --glow-2: rgba(117, 148, 155, 0.10);
 }
 
 :root[data-theme="paper"] {
-  --void: #F7F5F1;
-  --void-2: #F1EEE8;
+  --void: #F5F3EE;
+  --void-2: #EEEAE2;
   --panel: #FFFEFC;
-  --panel-2: #FBF9F5;
-  --ink: #342F2B;
-  --ink-soft: #665D56;
-  --muted: #857A70;
-  --line: rgba(52, 47, 43, 0.13);
-  --line-strong: rgba(52, 47, 43, 0.25);
-  --accent: #B15F46;
-  --accent-dim: rgba(177, 95, 70, 0.12);
-  --danger: #B85F59;
-  --gutter: #ECE7DE;
-  --shadow: 0 18px 40px rgba(76, 61, 50, 0.12);
-  --glow: rgba(177, 95, 70, 0.06);
-  --glow-2: rgba(173, 150, 122, 0.10);
+  --panel-2: #FBF9F4;
+  --ink: #383632;
+  --ink-soft: #6B655E;
+  --muted: #897F75;
+  --line: rgba(56, 54, 50, 0.12);
+  --line-strong: rgba(56, 54, 50, 0.24);
+  --accent: #9A6A52;
+  --accent-dim: rgba(154, 106, 82, 0.11);
+  --danger: #A86259;
+  --gutter: #E7E1D7;
+  --shadow: 0 18px 40px rgba(72, 59, 48, 0.11);
+  --glow: rgba(154, 106, 82, 0.05);
+  --glow-2: rgba(160, 142, 119, 0.08);
 }
 
 :root[data-theme="forest"] {
-  --void: #EFF5F1;
-  --void-2: #E5EFE8;
+  --void: #EFF3F0;
+  --void-2: #E6EEE9;
   --panel: #FFFFFF;
-  --panel-2: #F6FAF7;
-  --ink: #294137;
-  --ink-soft: #5B7065;
-  --muted: #75887D;
-  --line: rgba(41, 65, 55, 0.12);
-  --line-strong: rgba(41, 65, 55, 0.24);
-  --accent: #3F7D61;
-  --accent-dim: rgba(63, 125, 97, 0.12);
-  --danger: #B76059;
-  --gutter: #E3EEE6;
-  --shadow: 0 18px 40px rgba(43, 69, 54, 0.11);
-  --glow: rgba(63, 125, 97, 0.06);
-  --glow-2: rgba(114, 151, 127, 0.10);
+  --panel-2: #F7FAF8;
+  --ink: #2F4238;
+  --ink-soft: #607167;
+  --muted: #7E8E85;
+  --line: rgba(47, 66, 56, 0.12);
+  --line-strong: rgba(47, 66, 56, 0.24);
+  --accent: #5F7E6D;
+  --accent-dim: rgba(95, 126, 109, 0.11);
+  --danger: #A86259;
+  --gutter: #E1EAE4;
+  --shadow: 0 18px 40px rgba(43, 66, 53, 0.10);
+  --glow: rgba(95, 126, 109, 0.05);
+  --glow-2: rgba(121, 151, 132, 0.08);
 }
 
 :root[data-theme="plum"] {
-  --void: #F4EFF4;
-  --void-2: #EDE5ED;
+  --void: #F3F0F2;
+  --void-2: #EBE6EA;
   --panel: #FFFFFF;
-  --panel-2: #FBF7FB;
-  --ink: #443A46;
-  --ink-soft: #6D6071;
-  --muted: #897B8C;
-  --line: rgba(68, 58, 70, 0.12);
-  --line-strong: rgba(68, 58, 70, 0.24);
-  --accent: #865777;
-  --accent-dim: rgba(134, 87, 119, 0.12);
-  --danger: #B85D70;
-  --gutter: #ECE3EC;
-  --shadow: 0 18px 40px rgba(63, 45, 68, 0.12);
-  --glow: rgba(134, 87, 119, 0.06);
-  --glow-2: rgba(133, 123, 175, 0.10);
+  --panel-2: #FAF8FA;
+  --ink: #453D45;
+  --ink-soft: #6F646D;
+  --muted: #8C8089;
+  --line: rgba(69, 61, 69, 0.12);
+  --line-strong: rgba(69, 61, 69, 0.24);
+  --accent: #826C79;
+  --accent-dim: rgba(130, 108, 121, 0.11);
+  --danger: #A86268;
+  --gutter: #E8E1E6;
+  --shadow: 0 18px 40px rgba(63, 49, 61, 0.11);
+  --glow: rgba(130, 108, 121, 0.05);
+  --glow-2: rgba(145, 131, 145, 0.08);
 }
 
 /* Technology hotspot source logo tiles. */
@@ -346,12 +346,14 @@ select {
   width: 68%;
   height: 68%;
   object-fit: contain;
+  filter: grayscale(1) saturate(0) contrast(0.9);
+  opacity: 0.72;
 }
 .thumb.source-logo img[hidden] {
   display: none;
 }
 .source-monogram {
-  color: var(--accent);
+  color: var(--ink-soft);
   font-family: var(--mono);
   font-size: 0.72rem;
   font-weight: 600;
