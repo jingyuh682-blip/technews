@@ -16,7 +16,15 @@ test('loads the calm graphite theme after the base stylesheet', () => {
 test('defines the approved calm palette and removes page grain', () => {
   assert.equal(fs.existsSync(themePath), true, 'calm theme stylesheet must be present');
   const css = fs.readFileSync(themePath, 'utf8');
-  for (const token of ['--void: #151B20', '--panel: #202A31', '--ink: #E8F0F2', '--accent: #4FA88C']) {
+  for (const token of [
+    '--void: #3E4D55',
+    '--panel: #50616A',
+    '--panel-2: #5B6D75',
+    '--ink: #DCE5E7',
+    '--ink-soft: #C0CDD0',
+    '--muted: #A8B7BB',
+    '--accent: #7CC2A7'
+  ]) {
     assert.ok(css.includes(token), `missing token: ${token}`);
   }
   assert.match(css, /body::before\s*\{[^}]*opacity:\s*0/s);
