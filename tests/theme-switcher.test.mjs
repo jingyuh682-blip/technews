@@ -53,3 +53,17 @@ test('normalizes and persists a visitor theme choice', async () => {
   assert.equal(storage.getItem(themes.STORAGE_KEY), 'paper');
   assert.equal(themes.normalizeTheme('unknown'), 'mist');
 });
+
+
+test('emits a theme change event after applying a visitor choice', async () => {
+  const themes = await import(pathToFileURL(scriptPath).href + '?theme-test=event');
+  const events = [];
+  const documentRef = {
+    documentElement: { dataset: {} },
+    dispatchEvent: (event) => events.push({ type: event.type, detail: event.detail })
+  };
+
+  themes.applyTheme(documentRef, null, 'forest');
+
+  assert.deepEqual(events, [{ type: 'technews:themechange', detail: { theme: 'forest' } }]);
+});

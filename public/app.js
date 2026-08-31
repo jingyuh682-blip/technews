@@ -708,6 +708,17 @@
     return data;
   }
 
+  function readWordCloudPalette() {
+    const styles = getComputedStyle(document.documentElement);
+    return [
+      styles.getPropertyValue('--cloud-word-primary').trim(),
+      styles.getPropertyValue('--cloud-word-strong').trim(),
+      styles.getPropertyValue('--cloud-word-soft').trim(),
+      styles.getPropertyValue('--cloud-word-muted').trim(),
+      styles.getPropertyValue('--cloud-word-accent').trim()
+    ].filter(Boolean);
+  }
+
   function drawWordCloud(canvas, words) {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -726,7 +737,7 @@
     const placed = [];
     const cx = cssW / 2;
     const cy = cssH / 2;
-    const colors = ['#0f8a6a', '#146c8a', '#0b1f2a', '#1c3644', '#0d6e56'];
+    const colors = readWordCloudPalette();
 
     function collides(x, y, w, h) {
       for (let i = 0; i < placed.length; i++) {
@@ -759,7 +770,7 @@
       }
       if (!found) return;
       ctx.fillStyle = colors[i % colors.length];
-      ctx.globalAlpha = 0.75 + (i < 5 ? 0.2 : 0);
+      ctx.globalAlpha = 1;
       ctx.fillText(text, x, y);
       ctx.globalAlpha = 1;
       const box = { x: x - 2, y: y - th, w: tw + 6, h: th + 6, term: text, idx: i };
@@ -843,6 +854,7 @@
         drawWordCloud(canvas, words);
         syncHotspots();
       }
+      document.addEventListener('technews:themechange', redraw);
       redraw();
 
       async function showExplain(term) {

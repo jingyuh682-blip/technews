@@ -44,6 +44,14 @@ export function applyTheme(documentRef, storage, value) {
     if (meta) meta.content = THEMES[theme].browserColor;
   }
   persistTheme(storage, theme);
+      if (documentRef && typeof documentRef.dispatchEvent === 'function') {
+    const view = documentRef.defaultView || (typeof window !== 'undefined' ? window : null);
+    const ThemeEvent = view && typeof view.CustomEvent === 'function' ? view.CustomEvent : null;
+    const detail = { theme };
+    documentRef.dispatchEvent(ThemeEvent
+      ? new ThemeEvent('technews:themechange', { detail })
+      : { type: 'technews:themechange', detail });
+  }
   return theme;
 }
 
